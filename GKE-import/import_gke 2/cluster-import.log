@@ -1,0 +1,1285 @@
+secret "klusterlet-bootstrap" created
+serviceaccount "klusterlet-sa" created
+clusterrolebinding "klusterlet-crb" created
+secret "klusterlet-config" created
+job "install-klusterlet" created
+Using /installer/ansible.cfg as config file
+
+PLAY [Installing Klusterlet] ***************************************************
+
+TASK [kubectl-config : Checking if kube-config exist or not] *******************
+changed: [127.0.0.1 -> localhost] => changed=true 
+  cmd: |-
+    if kubectl get service &>/dev/null; then
+     echo "in-cluster.yaml"
+     elif ls -H /var/ansible/kubeconfig &>/dev/null; then
+     echo "use-exist.yaml"
+     else
+     echo "create-one.yaml"
+     fi
+  delta: '0:00:00.875977'
+  end: '2019-07-05 09:04:45.999265'
+  rc: 0
+  start: '2019-07-05 09:04:45.123288'
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: in-cluster.yaml
+  stdout_lines: <omitted>
+
+TASK [kubectl-config : include_tasks] ******************************************
+
+TASK [klusterlet-variables : Set install_klusterlet_playbook] ******************
+ok: [127.0.0.1] => changed=false 
+  ansible_facts:
+    cluster_name: ''
+    install_klusterlet_playbook: true
+
+TASK [klusterlet-variables : Enable management services] ***********************
+ok: [127.0.0.1] => changed=false 
+  ansible_facts:
+    management_services:
+      cert-manager: enabled
+      monitoring: enabled
+      multicluster-endpoint: enabled
+      tiller: enabled
+
+TASK [klusterlet-variables : Setting variable for tiller] **********************
+ok: [127.0.0.1] => changed=false 
+  ansible_facts:
+    tiller_host: localhost
+    tiller_node_selector: {}
+
+TASK [klusterlet-variables : Setting variable for cert-manager] ****************
+ok: [127.0.0.1] => changed=false 
+  ansible_facts:
+    cert_manager_node_selector: {}
+
+TASK [klusterlet-variables : Setting variable for monitoring] ******************
+ok: [127.0.0.1] => changed=false 
+  ansible_facts:
+    monitoring:
+      alertmanager:
+        enabled: false
+      clusterAddress: 127.0.0.1
+      clusterDomain: cluster.local
+      clusterName: mycluster
+      clusterPort: 8443
+      collectdExporter:
+        enabled: false
+      crdCreation: false
+      elasticsearchExporter:
+        enabled: false
+      grafana:
+        enabled: false
+      kubeStateMetrics:
+        enabled: false
+      mode: standard
+      nodeExporter:
+        enabled: false
+      prometheus:
+        etcdTarget:
+          enabled: false
+      router:
+        subjectAlt: 127.0.0.1
+
+TASK [klusterlet-variables : Get Kubernetes server version] ********************
+changed: [127.0.0.1] => changed=true 
+  cmd: kubectl version --short | grep Server
+  delta: '0:00:00.605410'
+  end: '2019-07-05 09:04:47.371746'
+  rc: 0
+  start: '2019-07-05 09:04:46.766336'
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: 'Server Version: v1.12.8-gke.10'
+  stdout_lines: <omitted>
+
+TASK [klusterlet-variables : Find ibmcloud-cluster-info configmap] *************
+changed: [127.0.0.1] => changed=true 
+  cmd: kubectl get configmap -n kube-public | grep ibmcloud-cluster-info | wc -l
+  delta: '0:00:00.621359'
+  end: '2019-07-05 09:04:48.264307'
+  rc: 0
+  start: '2019-07-05 09:04:47.642948'
+  stderr: No resources found.
+  stderr_lines: <omitted>
+  stdout: '0'
+  stdout_lines: <omitted>
+
+TASK [klusterlet-variables : Find mcm.ibm.com API] *****************************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [klusterlet-variables : Get proxy ingress HTTPS port] *********************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [klusterlet-variables : Find project.openshift.io API] ********************
+changed: [127.0.0.1] => changed=true 
+  cmd: kubectl api-versions | grep '^project.openshift.io/*' | wc -l
+  delta: '0:00:00.619250'
+  end: '2019-07-05 09:04:49.200265'
+  rc: 0
+  start: '2019-07-05 09:04:48.581015'
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: '0'
+  stdout_lines: <omitted>
+
+TASK [klusterlet-variables : Find omsagent service account] ********************
+changed: [127.0.0.1] => changed=true 
+  cmd: kubectl get sa -n kube-system | grep omsagent | wc -l
+  delta: '0:00:00.599055'
+  end: '2019-07-05 09:04:50.058678'
+  rc: 0
+  start: '2019-07-05 09:04:49.459623'
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: '0'
+  stdout_lines: <omitted>
+
+TASK [klusterlet-variables : Set deployed_on_hub default] **********************
+ok: [127.0.0.1] => changed=false 
+  ansible_facts:
+    deployed_on_hub: false
+
+TASK [klusterlet-variables : Set deployed_on_hub] ******************************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [klusterlet-variables : Set variables for ICP] ****************************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [klusterlet-variables : Set variables for ICP on OpenShift] ***************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [klusterlet-variables : Set variables for ICP on IKS] *********************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [klusterlet-variables : Set variables for OpenShift] **********************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [klusterlet-variables : Set variables for IKS] ****************************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [klusterlet-variables : Set variables for EKS] ****************************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [klusterlet-variables : Set variables for GKE] ****************************
+ok: [127.0.0.1] => changed=false 
+  ansible_facts:
+    kubernetes_cluster_type: other
+    multicluster_endpoint:
+      clusterLabels:
+        cloud: Google
+        vendor: GKE
+      klusterlet:
+        ingressType: None
+        serviceType: LoadBalancer
+
+TASK [klusterlet-variables : Set variables for AKS] ****************************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [klusterlet-variables : Validate clusterName] *****************************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [klusterlet-variables : Validate clusterNamespace] ************************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [klusterlet-variables : Check clusterName and clusterNamespace when not deployed_on_hub] ***
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [klusterlet-variables : Check clusterName and clusterNamespace when deployed_on_hub] ***
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [openshift-scc : SCC for icp services on openshift] ***********************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [rbac-config : Creating rbac roles] ***************************************
+changed: [127.0.0.1 -> localhost] => changed=true 
+  cmd: |-
+    index=0
+     retries=100
+     while true; do
+     sleep 6
+     index=$(( index + 1 ))
+     if [[ $index -eq $retries ]]; then
+     echo "Failed to create rbac roles"
+     exit 1
+     fi
+     kubectl api-versions | grep -w rbac.authorization.k8s.io/v1 && kubectl apply --force --overwrite=true -f /installer/playbook/roles/rbac-config/files/rbac.yaml && break || continue
+     done
+  delta: '0:00:07.098690'
+  end: '2019-07-05 09:04:58.155239'
+  rc: 0
+  start: '2019-07-05 09:04:51.056549'
+  stderr: 'Warning: kubectl apply should be used on resource created by either kubectl create --save-config or kubectl apply'
+  stderr_lines: <omitted>
+  stdout: |-
+    rbac.authorization.k8s.io/v1
+    clusterrole.rbac.authorization.k8s.io/icp:edit created
+    clusterrole.rbac.authorization.k8s.io/icp-edit-aggregate created
+    clusterrole.rbac.authorization.k8s.io/icp:operate created
+    clusterrole.rbac.authorization.k8s.io/icp-operate-aggregate created
+    clusterrole.rbac.authorization.k8s.io/icp:view created
+    clusterrole.rbac.authorization.k8s.io/icp-view-aggregate created
+    clusterrole.rbac.authorization.k8s.io/icp:admin created
+    clusterrole.rbac.authorization.k8s.io/icp-admin-aggregate created
+    clusterrole.rbac.authorization.k8s.io/extension created
+    clusterrolebinding.rbac.authorization.k8s.io/admin-users created
+    clusterrole.rbac.authorization.k8s.io/ibm-restricted-clusterrole created
+    clusterrole.rbac.authorization.k8s.io/ibm-anyuid-clusterrole created
+    clusterrole.rbac.authorization.k8s.io/ibm-anyuid-hostpath-clusterrole created
+    clusterrole.rbac.authorization.k8s.io/ibm-anyuid-hostaccess-clusterrole created
+    clusterrole.rbac.authorization.k8s.io/ibm-privileged-clusterrole created
+    clusterrolebinding.rbac.authorization.k8s.io/ibm-privileged-psp-users created
+    clusterrolebinding.rbac.authorization.k8s.io/system:node configured
+    clusterrole.rbac.authorization.k8s.io/icp:teamadmin created
+    clusterrolebinding.rbac.authorization.k8s.io/system:node-bootstrapper created
+    clusterrolebinding.rbac.authorization.k8s.io/system:certificates.k8s.io:certificatesigningrequests:nodeclient created
+    clusterrolebinding.rbac.authorization.k8s.io/system:certificates.k8s.io:certificatesigningrequests:selfnodeclient created
+    clusterrolebinding.rbac.authorization.k8s.io/system:certificates.k8s.io:certificatesigningrequests:selfnodeserver created
+  stdout_lines: <omitted>
+
+TASK [root-ca-certs : Ensuring that the certificate directory exist] ***********
+changed: [127.0.0.1] => changed=true 
+  gid: 0
+  group: root
+  mode: '0700'
+  owner: root
+  path: /var/ansible/cfc-certs/root-ca
+  size: 4096
+  state: directory
+  uid: 0
+
+TASK [root-ca-certs : Generating Root CA certificates] *************************
+changed: [127.0.0.1] => changed=true 
+  cmd: openssl req -newkey rsa:4096 -sha256 -nodes -keyout ca.key -x509 -days 3650 -out ca.crt -subj "/C=US/ST=New York/L=Armonk/O=IBM Cloud Private/CN=www.ibm.com" -config /installer/playbook/roles/root-ca-certs/files/ca-cert.cnf
+  delta: '0:00:00.881349'
+  end: '2019-07-05 09:04:59.748076'
+  rc: 0
+  start: '2019-07-05 09:04:58.866727'
+  stderr: |-
+    Generating a RSA private key
+    ..................++++
+    .......................................................++++
+    writing new private key to 'ca.key'
+    -----
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+TASK [root-ca-certs : Converting Root CA key into pkcs1 format] ****************
+changed: [127.0.0.1] => changed=true 
+  cmd: openssl rsa -in /var/ansible/cfc-certs/root-ca/ca.key -out /var/ansible/cfc-certs/root-ca/ca.key.p1
+  delta: '0:00:00.531304'
+  end: '2019-07-05 09:05:00.544636'
+  rc: 0
+  start: '2019-07-05 09:05:00.013332'
+  stderr: writing RSA key
+  stderr_lines: <omitted>
+  stdout: ''
+  stdout_lines: <omitted>
+
+TASK [root-ca-certs-secrets : Create Root CA secret] ***************************
+changed: [127.0.0.1] => changed=true 
+  cmd: |-
+    if [[ "klusterlet" == "icp" ]] || ! kubectl -n kube-system get secret cluster-ca-cert; then
+     kubectl -n kube-system create secret tls cluster-ca-cert --cert=root-ca/ca.crt --key=root-ca/ca.key.p1 --dry-run -o yaml | kubectl apply -f -
+     fi
+  delta: '0:00:00.834411'
+  end: '2019-07-05 09:05:01.649865'
+  rc: 0
+  start: '2019-07-05 09:05:00.815454'
+  stderr: 'Error from server (NotFound): secrets "cluster-ca-cert" not found'
+  stderr_lines: <omitted>
+  stdout: secret/cluster-ca-cert created
+  stdout_lines: <omitted>
+
+TASK [root-ca-certs-secrets : Creating ibmcloud-cluster-ca-cert rbac] **********
+changed: [127.0.0.1] => changed=true 
+  cmd: |-
+    cat <<EOF | kubectl apply -f -
+    ---
+    kind: Role
+    apiVersion: rbac.authorization.k8s.io/v1
+    metadata:
+      name: ibmcloud-cluster-ca-cert
+      namespace: kube-public
+    rules:
+      - apiGroups: [""]
+        resources: ["secret"]
+        resourceNames: ["ibmcloud-cluster-ca-cert"]
+        verbs: ["get"]
+  
+    ---
+    kind: RoleBinding
+    apiVersion: rbac.authorization.k8s.io/v1
+    metadata:
+      name: ibmcloud-cluster-ca-cert
+      namespace: kube-public
+    subjects:
+      - kind: Group
+        apiGroup: rbac.authorization.k8s.io
+        name: "system:authenticated"
+      - kind: Group
+        apiGroup: rbac.authorization.k8s.io
+        name: "system:unauthenticated"
+    roleRef:
+      kind: Role
+      name: ibmcloud-cluster-ca-cert
+      apiGroup: rbac.authorization.k8s.io
+    EOF
+  delta: '0:00:00.743715'
+  end: '2019-07-05 09:05:02.679335'
+  rc: 0
+  start: '2019-07-05 09:05:01.935620'
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: |-
+    role.rbac.authorization.k8s.io/ibmcloud-cluster-ca-cert created
+    rolebinding.rbac.authorization.k8s.io/ibmcloud-cluster-ca-cert created
+  stdout_lines: <omitted>
+
+TASK [root-ca-certs-secrets : Creating ibmcloud-cluster-ca-cert secret] ********
+changed: [127.0.0.1] => changed=true 
+  cmd: |-
+    cat <<EOF | kubectl apply -f -
+    kind: Secret
+    apiVersion: v1
+    metadata:
+      name: ibmcloud-cluster-ca-cert
+      namespace: kube-public
+    data:
+      ca.crt: $(kubectl -n kube-system get secret cluster-ca-cert -o jsonpath='{.data.tls\.crt}')
+    EOF
+  delta: '0:00:00.724135'
+  end: '2019-07-05 09:05:03.672002'
+  rc: 0
+  start: '2019-07-05 09:05:02.947867'
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: secret/ibmcloud-cluster-ca-cert created
+  stdout_lines: <omitted>
+
+TASK [k8s-helm-certs : Generating tiller and helm certificates] ****************
+changed: [127.0.0.1] => changed=true 
+  cmd: |-
+    if ! kubectl -n kube-system get secret helm-tiller-secret; then
+     kubectl -n kube-system get secret cluster-ca-cert -o jsonpath='{.data.tls\.crt}' | base64 -d > ca.crt
+     kubectl -n kube-system get secret cluster-ca-cert -o jsonpath='{.data.tls\.key}' | base64 -d > ca.key
+     export CERT_DIR=/tmp/helm
+     export ROOT_CA_CRT=/tmp/ca.crt
+     export ROOT_CA_KEY=/tmp/ca.key
+     export ADMIN_USER=admin
+     /installer/playbook/roles/k8s-helm-certs/files/make-helm-certs.sh DNS:tiller-deploy,DNS:tiller-deploy.kube-system,DNS:tiller-deploy.kube-system:44134,DNS:tiller-deploy.kube-system.svc,DNS:localhost
+  
+     kubectl -n kube-system create secret generic helm-tiller-secret --from-file=key=helm/tiller.key --from-file=crt=helm/tiller.crt
+     fi
+  
+     mkdir -p /var/ansible/cfc-certs/root-ca /var/ansible/cfc-certs/helm
+     kubectl -n kube-system get secret cluster-ca-cert -o jsonpath='{.data.tls\.crt}' | base64 -d > /var/ansible/cfc-certs/root-ca/ca.crt
+     kubectl -n kube-system get secret helm-tiller-secret -o jsonpath='{.data.crt}' | base64 -d > /var/ansible/cfc-certs/helm/tiller.crt
+     kubectl -n kube-system get secret helm-tiller-secret -o jsonpath='{.data.key}' | base64 -d > /var/ansible/cfc-certs/helm/tiller.key
+  delta: '0:00:01.492898'
+  end: '2019-07-05 09:05:05.435608'
+  rc: 0
+  start: '2019-07-05 09:05:03.942710'
+  stderr: 'Error from server (NotFound): secrets "helm-tiller-secret" not found'
+  stderr_lines: <omitted>
+  stdout: secret/helm-tiller-secret created
+  stdout_lines: <omitted>
+
+TASK [image-pull-secret : Waiting for default service account to exists] *******
+skipping: [127.0.0.1] => (item=kube-system)  => changed=false 
+  item: kube-system
+  skip_reason: Conditional result was False
+skipping: [127.0.0.1] => (item=cert-manager)  => changed=false 
+  item: cert-manager
+  skip_reason: Conditional result was False
+
+TASK [image-pull-secret : Adding ImagePullSecrets to system namespace service account] ***
+skipping: [127.0.0.1] => (item=kube-system)  => changed=false 
+  item: kube-system
+  skip_reason: Conditional result was False
+skipping: [127.0.0.1] => (item=cert-manager)  => changed=false 
+  item: cert-manager
+  skip_reason: Conditional result was False
+
+TASK [image-pull-secret : Waiting for default service account to exists] *******
+skipping: [127.0.0.1] => (item=multicluster-endpoint)  => changed=false 
+  item: multicluster-endpoint
+  skip_reason: Conditional result was False
+
+TASK [image-pull-secret : Adding ImagePullSecrets to system namespace service account] ***
+skipping: [127.0.0.1] => (item=multicluster-endpoint)  => changed=false 
+  item: multicluster-endpoint
+  skip_reason: Conditional result was False
+
+TASK [tiller : Ensuring component directory exist] *****************************
+changed: [127.0.0.1] => changed=true 
+  gid: 0
+  group: root
+  mode: '0700'
+  owner: root
+  path: /var/ansible/cfc-components
+  size: 4096
+  state: directory
+  uid: 0
+
+TASK [tiller : Ensuring that the tiller.yaml file exist] ***********************
+changed: [127.0.0.1] => changed=true 
+  checksum: 6a52c966ae89e73caf9ecdfbfc57001e97a15ffb
+  dest: /var/ansible/cfc-components/tiller.yaml
+  gid: 0
+  group: root
+  md5sum: b66f52e795385735314709129c67986b
+  mode: '0600'
+  owner: root
+  size: 17172
+  src: /tmp/ansible-tmp-1562317505.99-48368009895796/source
+  state: file
+  uid: 0
+
+TASK [tiller : Deploying Tiller] ***********************************************
+changed: [127.0.0.1] => changed=true 
+  cmd: kubectl apply --force --overwrite=true -f /var/ansible/cfc-components/tiller.yaml
+  delta: '0:00:00.761685'
+  end: '2019-07-05 09:05:07.636452'
+  rc: 0
+  start: '2019-07-05 09:05:06.874767'
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: |-
+    secret/tiller-secret created
+    service/tiller-deploy created
+    deployment.extensions/tiller-deploy created
+  stdout_lines: <omitted>
+
+TASK [tiller : Waiting for Tiller to start] ************************************
+changed: [127.0.0.1] => changed=true 
+  cmd: |-
+    index=0
+     retries=60
+     while true; do
+     sleep 10
+     index=$(( index + 1 ))
+     if [[ $index -eq $retries ]]; then
+     echo "Failed to start Tiller, following is related info"
+     kubectl -n kube-system get pods
+     kubectl -n kube-system describe pod $(kubectl -n kube-system get pods -l app=helm,name=tiller -o jsonpath="{.items[0].metadata.name}")
+     exit 1
+     fi
+     kubectl -n kube-system get pods --no-headers -l app=helm,name=tiller | awk '/Running/' | grep 1/1 && break
+     done
+  delta: '0:00:20.714907'
+  end: '2019-07-05 09:05:28.632169'
+  rc: 0
+  start: '2019-07-05 09:05:07.917262'
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: tiller-deploy-78dff45fc4-bv928   1/1   Running   0     21s
+  stdout_lines: <omitted>
+
+TASK [helm-config : Setting up Helm cli] ***************************************
+changed: [127.0.0.1] => changed=true 
+  attempts: 1
+  cmd: |-
+    helm init --client-only --skip-refresh
+     export HELM_HOME=~/.helm
+     kubectl -n kube-system get secret cluster-ca-cert -o jsonpath='{.data.tls\.crt}' | base64 -d > ca.crt
+     kubectl -n kube-system get secret cluster-ca-cert -o jsonpath='{.data.tls\.key}' | base64 -d > ca.key
+     openssl genrsa -out $HELM_HOME/key.pem 4096
+     openssl req -new -key $HELM_HOME/key.pem -out $HELM_HOME/csr.pem -subj "/C=US/ST=New York/L=Armonk/O=IBM Cloud Private/CN=admin"
+     openssl x509 -req -in $HELM_HOME/csr.pem -extensions v3_usr -CA ca.crt -CAkey ca.key -CAcreateserial -out $HELM_HOME/cert.pem
+     kubectl -n kube-system get pods -l app=helm,name=tiller
+     index=0
+     retries=10
+     while true; do
+     helm list --tls && break
+     helm list --tls 1>/dev/null 2>/tmp/helm-error
+     msg=$(< /tmp/helm-error)
+     if [[ "$msg" =~ "incompatible versions" ]]; then
+     cp /usr/local/helm /usr/local/bin/helm
+     fi
+     [[ $index -eq $retries ]] && break
+     sleep 10
+     index=$(( index + 1 ))
+     done
+  delta: '0:00:01.944641'
+  end: '2019-07-05 09:05:30.858604'
+  rc: 0
+  start: '2019-07-05 09:05:28.913963'
+  stderr: |-
+    Generating RSA private key, 4096 bit long modulus (2 primes)
+    .............................................++++
+    .........................................................................................................................................................++++
+    e is 65537 (0x010001)
+    Signature ok
+    subject=C = US, ST = New York, L = Armonk, O = IBM Cloud Private, CN = admin
+    Getting CA Private Key
+  stderr_lines: <omitted>
+  stdout: |-
+    Creating /root/.helm
+    Creating /root/.helm/repository
+    Creating /root/.helm/repository/cache
+    Creating /root/.helm/repository/local
+    Creating /root/.helm/plugins
+    Creating /root/.helm/starters
+    Creating /root/.helm/cache/archive
+    Creating /root/.helm/repository/repositories.yaml
+    Adding stable repo with URL: https://kubernetes-charts.storage.googleapis.com
+    Adding local repo with URL: http://127.0.0.1:8879/charts
+    $HELM_HOME has been configured at /root/.helm.
+    Not installing Tiller due to 'client-only' flag having been set
+    Happy Helming!
+    NAME                             READY   STATUS    RESTARTS   AGE
+    tiller-deploy-78dff45fc4-bv928   1/1     Running   0          23s
+  stdout_lines: <omitted>
+
+TASK [chart-repo : Add Helm Chart Repository] **********************************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [addon : include_tasks] ***************************************************
+included: /installer/playbook/roles/addon/tasks/release.yaml for 127.0.0.1
+
+TASK [addon : Ensuring cert-manager resource directory exist] ******************
+changed: [127.0.0.1] => changed=true 
+  gid: 0
+  group: root
+  mode: '0700'
+  owner: root
+  path: /var/ansible/.addon/cert-manager
+  size: 4096
+  state: directory
+  uid: 0
+
+TASK [addon : Getting resource file for cert-manager chart] ********************
+ok: [127.0.0.1] => changed=false 
+  stat:
+    exists: false
+
+TASK [addon : Generating resource file for cert-manager chart] *****************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [addon : Creating resources for cert-manager chart] ***********************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [addon : Checking pre-install task file] **********************************
+ok: [127.0.0.1] => changed=false 
+  stat:
+    exists: false
+
+TASK [addon : include_tasks] ***************************************************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [addon : Generating values.yaml for cert-manager chart] *******************
+changed: [127.0.0.1] => changed=true 
+  checksum: e2e213e06a713d9f17adb9b2d491539542e9e514
+  dest: /var/ansible/.addon/cert-manager/values.yaml
+  gid: 0
+  group: root
+  md5sum: 13b5a116ccb1cb28e239f861fd612540
+  mode: '0644'
+  owner: root
+  size: 473
+  src: /tmp/ansible-tmp-1562317532.06-127667649423650/source
+  state: file
+  uid: 0
+
+TASK [addon : Installing cert-manager chart] ***********************************
+changed: [127.0.0.1] => changed=true 
+  attempts: 1
+  cmd: |-
+    filename="/addon/ibm-cert-manager-3.2.0.tgz"
+     if [[ -d "/addon/ibm-cert-manager-3.2.0.tgz" ]]; then
+     filename=$(ls /addon/ibm-cert-manager-3.2.0.tgz/*.tgz | tail -1)
+     fi
+     ret=0
+     if helm status --tls cert-manager &>/dev/null && helm status --tls cert-manager | grep -q 'STATUS: FAILED'; then
+     rev=$(helm list --tls cert-manager | awk '{if($1 == "cert-manager"){print $2;exit}}')
+     if [[ "$rev" == "1" ]]; then
+     helm delete --tls --purge --timeout=600 cert-manager
+     ret=$?
+     sleep 5
+     fi
+     fi
+     if ! helm status --tls cert-manager &>/dev/null; then
+     helm install --tls --timeout=600  --name=cert-manager --namespace=cert-manager -f .addon/cert-manager/values.yaml $filename
+     ret=$?
+     elif false && helm status --tls cert-manager &>/dev/null; then
+     helm upgrade --tls --timeout=600  cert-manager --namespace=cert-manager -f .addon/cert-manager/values.yaml $filename
+     ret=$?
+     fi
+     if [[ $ret -ne 0 ]]; then
+     tiller_pod=$(kubectl -n kube-system get pods -l app=helm,name=tiller -o jsonpath="{.items[0].metadata.name}")
+     sleep 5
+     kubectl -n kube-system logs $tiller_pod |& tail -n 500
+     fi
+     exit $ret
+  delta: '0:00:02.005976'
+  end: '2019-07-05 09:05:34.657100'
+  rc: 0
+  start: '2019-07-05 09:05:32.651124'
+  stderr: 'E0705 09:05:34.535604     921 portforward.go:303] error copying from remote stream to local connection: readfrom tcp4 127.0.0.1:37545->127.0.0.1:40456: write tcp4 127.0.0.1:37545->127.0.0.1:40456: write: broken pipe'
+  stderr_lines: <omitted>
+  stdout: |-
+    NAME:   cert-manager
+    LAST DEPLOYED: Fri Jul  5 09:05:33 2019
+    NAMESPACE: cert-manager
+    STATUS: DEPLOYED
+  
+    RESOURCES:
+    ==> v1/Pod(related)
+    NAME                                            READY  STATUS             RESTARTS  AGE
+    cert-manager-ibm-cert-manager-5d5c9c5986-vhfh2  0/1    ContainerCreating  0         0s
+  
+    ==> v1beta1/CustomResourceDefinition
+    NAME                               AGE
+    clusterissuers.certmanager.k8s.io  0s
+    orders.certmanager.k8s.io          0s
+    challenges.certmanager.k8s.io      0s
+    certificates.certmanager.k8s.io    0s
+    issuers.certmanager.k8s.io         0s
+  
+    ==> v1/ClusterRole
+    NAME                                AGE
+    cert-manager-ibm-cert-manager-view  0s
+    cert-manager-ibm-cert-manager-edit  0s
+  
+    ==> v1beta1/ClusterRole
+    NAME                           AGE
+    cert-manager-ibm-cert-manager  0s
+  
+    ==> v1beta1/ClusterRoleBinding
+    NAME                           AGE
+    cert-manager-ibm-cert-manager  0s
+  
+    ==> v1beta1/Deployment
+    NAME                           DESIRED  CURRENT  UP-TO-DATE  AVAILABLE  AGE
+    cert-manager-ibm-cert-manager  1        1        1           0          0s
+  
+  
+    NOTES:
+    IBM cert-manager has been deployed successfully!
+  
+    In order to begin issuing certificates, you will need to set up a ClusterIssuer. An icp-ca-issuer is automatically created as a ClusterIssuer for each IBM Cloud Private installation. This Issuer contains the self-signed IBM Cloud Private cluster CA and is accessible from all namespaces. More Issuers (namespace-scoped) or ClusterIssuers (cluster-scoped) can be defined.
+  
+    More information on generating certificates can be found in our documentation:
+  
+    https://www.ibm.com/support/knowledgecenter/en/SSBS6K_3.1.0/manage_applications/create_cert.html
+  stdout_lines: <omitted>
+
+TASK [addon : Checking post-install task file] *********************************
+ok: [127.0.0.1] => changed=false 
+  stat:
+    atime: 1558620366.0
+    attr_flags: ''
+    attributes: []
+    block_size: 4096
+    blocks: 8
+    charset: unknown
+    checksum: 6429742cde22a4b9b379ff745da8cbf6b51777ed
+    ctime: 1562317474.3277621
+    dev: 1048579
+    device_type: 0
+    executable: false
+    exists: true
+    gid: 0
+    gr_name: root
+    inode: 1306616
+    isblk: false
+    ischr: false
+    isdir: false
+    isfifo: false
+    isgid: false
+    islnk: false
+    isreg: true
+    issock: false
+    isuid: false
+    mimetype: unknown
+    mode: '0664'
+    mtime: 1558620366.0
+    nlink: 1
+    path: /installer/playbook/roles/addon/tasks/post-tasks/cert-manager.yaml
+    pw_name: root
+    readable: true
+    rgrp: true
+    roth: true
+    rusr: true
+    size: 2710
+    uid: 0
+    version: null
+    wgrp: true
+    woth: false
+    writeable: true
+    wusr: true
+    xgrp: false
+    xoth: false
+    xusr: false
+
+TASK [addon : include_tasks] ***************************************************
+included: /installer/playbook/roles/addon/tasks/post-tasks/cert-manager.yaml for 127.0.0.1
+
+TASK [addon : Waiting for ClusterIssuer CRD] ***********************************
+changed: [127.0.0.1] => changed=true 
+  attempts: 1
+  cmd: |-
+    kubectl api-resources | grep -q clusterissuers
+    if [[ "$?" != 0 ]] ; then
+      echo "Custom Resource Definition ClusterIssuers Not Ready."
+    else
+      echo "DONE"
+    fi
+  delta: '0:00:00.838899'
+  end: '2019-07-05 09:05:36.209294'
+  rc: 0
+  start: '2019-07-05 09:05:35.370395'
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: DONE
+  stdout_lines: <omitted>
+
+TASK [addon : Configuring cert-manager with Root CA Issuer] ********************
+changed: [127.0.0.1] => changed=true 
+  attempts: 1
+  cmd: |-
+    cat <<EOF | kubectl apply -f -
+    apiVersion: certmanager.k8s.io/v1alpha1
+    kind: ClusterIssuer
+    metadata:
+      name: icp-ca-issuer
+    spec:
+      ca:
+        secretName: cluster-ca-cert
+    EOF
+    if [[ "$?" == "0" ]] ; then
+      echo
+      echo "----------------------- Cluster Issuer icp-ca-issuer ------------------------"
+      findFalse=$(kubectl get clusterissuer icp-ca-issuer -o yaml --no-headers | grep False | tr -d \" | awk '{print $2}')
+      status=$(echo $findFalse | awk '$1!="False" {print "READY"}')
+      if [[ $status != "READY" ]] ; then
+        echo "Cluster Issuer icp-ca-issuer is not ready."
+        reason=$(kubectl get clusterissuer icp-ca-issuer -o yaml --no-headers | grep reason | awk '{print $2}')
+        echo "Reason: $reason"
+        cmPod=$(kubectl get pods -n cert-manager -o custom-columns=:metadata.name --no-headers | grep cert)
+        if [[ -z $cmPod ]] ; then
+          echo "Cert-manager pod doesn't exist."
+        else
+          cmStatus=$(kubectl get pods $cmPod -n cert-manager -o custom-columns=:status.phase --no-headers)
+          if [[ "$cmStatus" == "Running" ]] ; then
+            echo "----------------------- Pod ${cmPod} Logs -------------------------------"
+            kubectl logs $(kubectl get pods -n cert-manager -o custom-columns=:metadata.name | grep cert) -n cert-manager | grep clusterissuer
+          elif [[ "$cmStatus" == "Pending" ]] ; then
+            echo "Pod ${cmPod} is not running."
+            echo "----------------------- Pod ${cmPod} Events ---------------------"
+            kubectl -n cert-manager get event -owide --field-selector involvedObject.name=${cmPod}
+          fi
+        fi
+      else
+        echo "DONE"
+      fi
+    else
+      echo "Command to create cluster issuer did not complete successfully."
+    fi
+  delta: '0:00:00.883826'
+  end: '2019-07-05 09:05:37.367138'
+  rc: 0
+  start: '2019-07-05 09:05:36.483312'
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: |-
+    clusterissuer.certmanager.k8s.io/icp-ca-issuer created
+  
+    ----------------------- Cluster Issuer icp-ca-issuer ------------------------
+    DONE
+  stdout_lines: <omitted>
+
+TASK [addon : include_tasks] ***************************************************
+skipping: [127.0.0.1] => (item={'key': u'cert-manager', 'value': {u'path': u'/addon/ibm-cert-manager-3.2.0.tgz', u'namespace': u'cert-manager'}})  => changed=false 
+  item:
+    key: cert-manager
+    value:
+      namespace: cert-manager
+      path: /addon/ibm-cert-manager-3.2.0.tgz
+  skip_reason: Conditional result was False
+
+TASK [addon : include_tasks] ***************************************************
+included: /installer/playbook/roles/addon/tasks/release.yaml for 127.0.0.1
+
+TASK [addon : Ensuring monitoring resource directory exist] ********************
+changed: [127.0.0.1] => changed=true 
+  gid: 0
+  group: root
+  mode: '0700'
+  owner: root
+  path: /var/ansible/.addon/monitoring
+  size: 4096
+  state: directory
+  uid: 0
+
+TASK [addon : Getting resource file for monitoring chart] **********************
+ok: [127.0.0.1] => changed=false 
+  stat:
+    exists: false
+
+TASK [addon : Generating resource file for monitoring chart] *******************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [addon : Creating resources for monitoring chart] *************************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [addon : Checking pre-install task file] **********************************
+ok: [127.0.0.1] => changed=false 
+  stat:
+    exists: false
+
+TASK [addon : include_tasks] ***************************************************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [addon : Generating values.yaml for monitoring chart] *********************
+changed: [127.0.0.1] => changed=true 
+  checksum: a93d26d4c7c89310ba6188a896fd6dbe41a011dd
+  dest: /var/ansible/.addon/monitoring/values.yaml
+  gid: 0
+  group: root
+  md5sum: 11b51efe2a69c67e0c065d33bf913053
+  mode: '0644'
+  owner: root
+  size: 1317
+  src: /tmp/ansible-tmp-1562317538.68-126826729210500/source
+  state: file
+  uid: 0
+
+TASK [addon : Installing monitoring chart] *************************************
+changed: [127.0.0.1] => changed=true 
+  attempts: 1
+  cmd: |-
+    filename="/addon/ibm-icpmonitoring-1.5.0.tgz"
+     if [[ -d "/addon/ibm-icpmonitoring-1.5.0.tgz" ]]; then
+     filename=$(ls /addon/ibm-icpmonitoring-1.5.0.tgz/*.tgz | tail -1)
+     fi
+     ret=0
+     if helm status --tls monitoring &>/dev/null && helm status --tls monitoring | grep -q 'STATUS: FAILED'; then
+     rev=$(helm list --tls monitoring | awk '{if($1 == "monitoring"){print $2;exit}}')
+     if [[ "$rev" == "1" ]]; then
+     helm delete --tls --purge --timeout=600 monitoring
+     ret=$?
+     sleep 5
+     fi
+     fi
+     if ! helm status --tls monitoring &>/dev/null; then
+     helm install --tls --timeout=600  --name=monitoring --namespace=kube-system -f .addon/monitoring/values.yaml $filename
+     ret=$?
+     elif false && helm status --tls monitoring &>/dev/null; then
+     helm upgrade --tls --timeout=600  monitoring --namespace=kube-system -f .addon/monitoring/values.yaml $filename
+     ret=$?
+     fi
+     if [[ $ret -ne 0 ]]; then
+     tiller_pod=$(kubectl -n kube-system get pods -l app=helm,name=tiller -o jsonpath="{.items[0].metadata.name}")
+     sleep 5
+     kubectl -n kube-system logs $tiller_pod |& tail -n 500
+     fi
+     exit $ret
+  delta: '0:00:02.575773'
+  end: '2019-07-05 09:05:41.868231'
+  rc: 0
+  start: '2019-07-05 09:05:39.292458'
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: |-
+    NAME:   monitoring
+    LAST DEPLOYED: Fri Jul  5 09:05:40 2019
+    NAMESPACE: kube-system
+    STATUS: DEPLOYED
+  
+    RESOURCES:
+    ==> v1/Pod(related)
+    NAME                                   READY  STATUS    RESTARTS  AGE
+    monitoring-prometheus-d5c74cfd4-jfplw  0/3    Init:0/1  0         0s
+  
+    ==> v1/ConfigMap
+    NAME                                                DATA  AGE
+    monitoring-prometheus-exporter-router-nginx-config  4     0s
+    monitoring-grafana-default-dashboards-config        2     0s
+    monitoring-prometheus                               1     0s
+    monitoring-prometheus-lua-script-config             1     0s
+    monitoring-prometheus-router-nginx-config           1     0s
+    monitoring-monitoring-router-entry-config           1     0s
+  
+    ==> v1beta1/ClusterRole
+    NAME                   AGE
+    monitoring-prometheus  0s
+  
+    ==> v1beta1/ClusterRoleBinding
+    NAME                   AGE
+    monitoring-prometheus  0s
+  
+    ==> v1/Service
+    NAME                   TYPE       CLUSTER-IP    EXTERNAL-IP  PORT(S)   AGE
+    monitoring-prometheus  ClusterIP  10.59.253.99  <none>       9090/TCP  0s
+  
+    ==> v1beta1/Deployment
+    NAME                   DESIRED  CURRENT  UP-TO-DATE  AVAILABLE  AGE
+    monitoring-prometheus  1        1        1           0          0s
+  
+    ==> v1beta1/Ingress
+    NAME                           HOSTS  ADDRESS  PORTS  AGE
+    monitoring-prometheus-ingress  *      80       0s
+  
+    ==> v1alpha1/Certificate
+    NAME                                                       AGE
+    monitoring-monitoring-elasticsearch-exporter-client-certs  0s
+    monitoring-monitoring-certs                                0s
+    monitoring-monitoring-client-certs                         0s
+    monitoring-monitoring-exporter-certs                       0s
+  stdout_lines: <omitted>
+
+TASK [addon : Checking post-install task file] *********************************
+ok: [127.0.0.1] => changed=false 
+  stat:
+    exists: false
+
+TASK [addon : include_tasks] ***************************************************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [addon : include_tasks] ***************************************************
+skipping: [127.0.0.1] => (item={'key': u'monitoring', 'value': {u'path': u'/addon/ibm-icpmonitoring-1.5.0.tgz', u'namespace': u'kube-system'}})  => changed=false 
+  item:
+    key: monitoring
+    value:
+      namespace: kube-system
+      path: /addon/ibm-icpmonitoring-1.5.0.tgz
+  skip_reason: Conditional result was False
+
+TASK [addon : include_tasks] ***************************************************
+included: /installer/playbook/roles/addon/tasks/release.yaml for 127.0.0.1
+
+TASK [addon : Ensuring multicluster-endpoint resource directory exist] *********
+changed: [127.0.0.1] => changed=true 
+  gid: 0
+  group: root
+  mode: '0700'
+  owner: root
+  path: /var/ansible/.addon/multicluster-endpoint
+  size: 4096
+  state: directory
+  uid: 0
+
+TASK [addon : Getting resource file for multicluster-endpoint chart] ***********
+ok: [127.0.0.1] => changed=false 
+  stat:
+    exists: false
+
+TASK [addon : Generating resource file for multicluster-endpoint chart] ********
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [addon : Creating resources for multicluster-endpoint chart] **************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [addon : Checking pre-install task file] **********************************
+ok: [127.0.0.1] => changed=false 
+  stat:
+    atime: 1558620366.0
+    attr_flags: ''
+    attributes: []
+    block_size: 4096
+    blocks: 16
+    charset: unknown
+    checksum: 8d98721d5cd36620ca3ba2f7ac0ee507b5d94d38
+    ctime: 1562317474.3277621
+    dev: 1048579
+    device_type: 0
+    executable: false
+    exists: true
+    gid: 0
+    gr_name: root
+    inode: 1306619
+    isblk: false
+    ischr: false
+    isdir: false
+    isfifo: false
+    isgid: false
+    islnk: false
+    isreg: true
+    issock: false
+    isuid: false
+    mimetype: unknown
+    mode: '0664'
+    mtime: 1558620366.0
+    nlink: 1
+    path: /installer/playbook/roles/addon/tasks/pre-tasks/multicluster-endpoint.yaml
+    pw_name: root
+    readable: true
+    rgrp: true
+    roth: true
+    rusr: true
+    size: 5369
+    uid: 0
+    version: null
+    wgrp: true
+    woth: false
+    writeable: true
+    wusr: true
+    xgrp: false
+    xoth: false
+    xusr: false
+
+TASK [addon : include_tasks] ***************************************************
+ [WARNING]: Ignoring invalid attribute: management_services
+included: /installer/playbook/roles/addon/tasks/pre-tasks/multicluster-endpoint.yaml for 127.0.0.1
+
+TASK [addon : Adding label to multicluster-endpoint namespaces] ****************
+changed: [127.0.0.1] => changed=true 
+  cmd: |-
+    kubectl get namespace multicluster-endpoint || kubectl create namespace multicluster-endpoint
+     kubectl label namespace multicluster-endpoint icp=system --overwrite=true
+  delta: '0:00:00.791455'
+  end: '2019-07-05 09:05:44.532175'
+  rc: 0
+  start: '2019-07-05 09:05:43.740720'
+  stderr: 'Error from server (NotFound): namespaces "multicluster-endpoint" not found'
+  stderr_lines: <omitted>
+  stdout: |-
+    namespace/multicluster-endpoint created
+    namespace/multicluster-endpoint labeled
+  stdout_lines: <omitted>
+
+TASK [addon : Set install_klusterlet_playbook default] *************************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [addon : Set deployed_on_hub default] *************************************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [addon : Set deployed_on_hub] *********************************************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [addon : Set multicluster_hub_api_token when deployed_on_hub] *************
+skipping: [127.0.0.1] => changed=false 
+  censored: 'the output has been hidden due to the fact that ''no_log: true'' was specified for this result'
+
+TASK [addon : Generate klusterlet-bootstrap kubeconfig when deployed_on_hub] ***
+skipping: [127.0.0.1] => changed=false 
+  censored: 'the output has been hidden due to the fact that ''no_log: true'' was specified for this result'
+
+TASK [addon : Create klusterlet-bootstrap secret when deployed_on_hub] *********
+skipping: [127.0.0.1] => changed=false 
+  censored: 'the output has been hidden due to the fact that ''no_log: true'' was specified for this result'
+
+TASK [addon : Check that the klusterlet-bootstrap.kubeconfig exists when not deployed_on_hub] ***
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [addon : Generate klusterlet-bootstrap kubeconfig when not deployed_on_hub] ***
+skipping: [127.0.0.1] => changed=false 
+  censored: 'the output has been hidden due to the fact that ''no_log: true'' was specified for this result'
+
+TASK [addon : Create klusterlet-bootstrap secret when not deployed_on_hub] *****
+skipping: [127.0.0.1] => changed=false 
+  censored: 'the output has been hidden due to the fact that ''no_log: true'' was specified for this result'
+
+TASK [addon : Set variables for ICP] *******************************************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [addon : Set variables for ICP on OpenShift] ******************************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [addon : Set variables for ICP on IKS] ************************************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [addon : Override clusterName to local-cluster when deployed_on_hub] ******
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [addon : Override clusterNamespace to local-cluster when deployed_on_hub] ***
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [addon : Generating values.yaml for multicluster-endpoint chart] **********
+changed: [127.0.0.1] => changed=true 
+  checksum: 55fd19a6fbeef8f2123e85715edce4a0453d1120
+  dest: /var/ansible/.addon/multicluster-endpoint/values.yaml
+  gid: 0
+  group: root
+  md5sum: 6169fae6eb0fb5af82d9bcfc76cd6ad4
+  mode: '0644'
+  owner: root
+  size: 1146
+  src: /tmp/ansible-tmp-1562317545.2-142693420653112/source
+  state: file
+  uid: 0
+
+TASK [addon : Installing multicluster-endpoint chart] **************************
+changed: [127.0.0.1] => changed=true 
+  attempts: 1
+  cmd: |-
+    filename="/addon/ibm-klusterlet-3.2.0.tgz"
+     if [[ -d "/addon/ibm-klusterlet-3.2.0.tgz" ]]; then
+     filename=$(ls /addon/ibm-klusterlet-3.2.0.tgz/*.tgz | tail -1)
+     fi
+     ret=0
+     if helm status --tls multicluster-endpoint &>/dev/null && helm status --tls multicluster-endpoint | grep -q 'STATUS: FAILED'; then
+     rev=$(helm list --tls multicluster-endpoint | awk '{if($1 == "multicluster-endpoint"){print $2;exit}}')
+     if [[ "$rev" == "1" ]]; then
+     helm delete --tls --purge --timeout=600 multicluster-endpoint
+     ret=$?
+     sleep 5
+     fi
+     fi
+     if ! helm status --tls multicluster-endpoint &>/dev/null; then
+     helm install --tls --timeout=600  --name=multicluster-endpoint --namespace=multicluster-endpoint -f .addon/multicluster-endpoint/values.yaml $filename
+     ret=$?
+     elif false && helm status --tls multicluster-endpoint &>/dev/null; then
+     helm upgrade --tls --timeout=600  multicluster-endpoint --namespace=multicluster-endpoint -f .addon/multicluster-endpoint/values.yaml $filename
+     ret=$?
+     fi
+     if [[ $ret -ne 0 ]]; then
+     tiller_pod=$(kubectl -n kube-system get pods -l app=helm,name=tiller -o jsonpath="{.items[0].metadata.name}")
+     sleep 5
+     kubectl -n kube-system logs $tiller_pod |& tail -n 500
+     fi
+     exit $ret
+  delta: '0:00:03.067668'
+  end: '2019-07-05 09:05:48.946416'
+  rc: 0
+  start: '2019-07-05 09:05:45.878748'
+  stderr: ''
+  stderr_lines: <omitted>
+  stdout: |-
+    NAME:   multicluster-endpoint
+    LAST DEPLOYED: Fri Jul  5 09:05:47 2019
+    NAMESPACE: multicluster-endpoint
+    STATUS: DEPLOYED
+  
+    RESOURCES:
+    ==> v1beta1/Deployment
+    NAME                                             DESIRED  CURRENT  UP-TO-DATE  AVAILABLE  AGE
+    multicluster-endpoint-policy-compliance          1        1        1           0          1s
+    multicluster-endpoint-ibm-klusterlet-klusterlet  1        1        1           0          1s
+    multicluster-endpoint-ibm-klusterlet-operator    1        1        1           0          1s
+    multicluster-endpoint-ibm-klusterlet-coredns     1        1        1           0          1s
+    multicluster-endpoint-topology-weave-scope-app   1        1        1           0          0s
+  
+    ==> v1/Deployment
+    NAME                                                   DESIRED  CURRENT  UP-TO-DATE  AVAILABLE  AGE
+    multicluster-endpoint-topology-weave-collector         1        1        1           0          1s
+    multicluster-endpoint-ibm-klusterlet-service-registry  1        1        1           0          1s
+  
+    ==> v1alpha1/Certificate
+    NAME                                                   AGE
+    multicluster-endpoint-topology-weavescope-client-cert  1s
+    multicluster-endpoint-topology-weavescope-server-cert  0s
+    multicluster-endpoint-klusterlet-ca-cert               0s
+    multicluster-endpoint-tiller-client-certs              0s
+  
+    ==> v1beta1/DaemonSet
+    NAME                                        DESIRED  CURRENT  READY  UP-TO-DATE  AVAILABLE  NODE SELECTOR  AGE
+    multicluster-endpoint-topology-weave-scope  1        1        0      1           0          <none>         0s
+  
+    ==> v1/ClusterRoleBinding
+    NAME                                  AGE
+    multicluster-endpoint:mcm:klusterlet  1s
+  
+    ==> v1/Service
+    NAME                                             TYPE          CLUSTER-IP     EXTERNAL-IP  PORT(S)        AGE
+    multicluster-endpoint-ibm-klusterlet-klusterlet  LoadBalancer  10.59.254.85   <pending>    443:30912/TCP  1s
+    mcm-svc-registry-dns                             ClusterIP     10.59.254.14   <none>       53/UDP,53/TCP  1s
+    multicluster-endpoint-topology-weave-scope       ClusterIP     10.59.241.160  <none>       443/TCP        0s
+  
+    ==> v1alpha1/Issuer
+    NAME                                          AGE
+    multicluster-endpoint-klusterlet-ca-issuer    0s
+    multicluster-endpoint-klusterlet-cert-issuer  0s
+  
+    ==> v1/Pod(related)
+    NAME                                                             READY  STATUS             RESTARTS  AGE
+    multicluster-endpoint-policy-compliance-65677c546d-xp4n6         0/3    ContainerCreating  0         1s
+    multicluster-endpoint-search-search-collector-69c9f997c-8pjlx    0/1    Pending            0         1s
+    multicluster-endpoint-topology-weave-collector-976cf8b68-bpwsk   0/1    ContainerCreating  0         1s
+    multicluster-endpoint-ibm-klusterlet-klusterlet-f7b4b5446-nmv4k  0/2    Pending            0         1s
+    multicluster-endpoint-ibm-klusterlet-operator-cb5bcfd9c-lqqpj    0/1    Pending            0         1s
+    multicluster-endpoint-ibm-klusterlet-service-registry-794dgdz7b  0/1    Pending            0         1s
+    multicluster-endpoint-ibm-klusterlet-coredns-b8b4bb574-26wkp     0/1    Pending            0         0s
+    multicluster-endpoint-topology-weave-scope-app-bc44db467-j5qpg   0/2    Pending            0         0s
+    multicluster-endpoint-topology-weave-scope-789bm                 0/1    Pending            0         0s
+  
+    ==> v1/ConfigMap
+    NAME                                                           DATA  AGE
+    multicluster-endpoint-topology-weave-collector-configmap       1     1s
+    multicluster-endpoint-topology-weavescope-router-nginx-config  1     1s
+    multicluster-endpoint-topology-weavescope-router-entry-config  1     1s
+    multicluster-endpoint-ibm-klusterlet-operator-config           1     1s
+    multicluster-endpoint-ibm-klusterlet-coredns                   2     1s
+  
+    ==> v1beta2/Deployment
+    NAME                                           DESIRED  CURRENT  UP-TO-DATE  AVAILABLE  AGE
+    multicluster-endpoint-search-search-collector  1        1        1           0          1s
+  
+  
+    NOTES:
+    Thank you for installing ibm-klusterlet.
+  
+    Your release is named multicluster-endpoint.
+  
+    To learn more about the release, try:
+  
+    $ helm status multicluster-endpoint
+    $ helm get multicluster-endpoint
+  stdout_lines: <omitted>
+
+TASK [addon : Checking post-install task file] *********************************
+ok: [127.0.0.1] => changed=false 
+  stat:
+    exists: false
+
+TASK [addon : include_tasks] ***************************************************
+skipping: [127.0.0.1] => changed=false 
+  skip_reason: Conditional result was False
+
+TASK [addon : include_tasks] ***************************************************
+skipping: [127.0.0.1] => (item={'key': u'multicluster-endpoint', 'value': {u'path': u'/addon/ibm-klusterlet-3.2.0.tgz', u'namespace': u'multicluster-endpoint', u'use_custom_template': True}})  => changed=false 
+  item:
+    key: multicluster-endpoint
+    value:
+      namespace: multicluster-endpoint
+      path: /addon/ibm-klusterlet-3.2.0.tgz
+      use_custom_template: true
+  skip_reason: Conditional result was False
+
+PLAY RECAP *********************************************************************
+127.0.0.1                  : ok=51   changed=30   unreachable=0    failed=0   
+
+Playbook run took 0 days, 0 hours, 1 minutes, 5 seconds
+
+waiting for the cluster join request to be created
+certificatesigningrequest "clusterjoin-BvRO-tP8WN_ORsqYy6W1kHrOd30Cw80FrnD5zGHvqf4" approved
+waiting for the cluster to join the hub
+cluster gke-mcm-cluster successfully added
