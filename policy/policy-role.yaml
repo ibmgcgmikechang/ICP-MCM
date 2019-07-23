@@ -1,0 +1,55 @@
+apiVersion: policy.mcm.ibm.com/v1alpha1
+kind: Policy
+metadata:
+  name: policy-role
+  namespace: kube-system
+  annotations:
+    policy.mcm.ibm.com/standards: HIPAA
+    policy.mcm.ibm.com/categories: SystemAndCommunicationsProtections,SystemAndInformationIntegrity
+    policy.mcm.ibm.com/controls: MutationAdvisor,VA
+spec:
+  remediationAction: "enforce" # enforce or inform 
+  namespaces:
+    include: ["default"]
+    exclude: ["kube*"]
+  role-templates:
+    - apiVersion: roletemplate.mcm.ibm.com/v1alpha1
+      metadata:
+        namespace: "" # will be inferred
+        name: operator-role-policy
+      selector:
+        matchLabels:
+          dev: "true"
+      complianceType: "musthave" # at this level, it means the role must exist with the rules that it musthave below
+      rules:
+        - complianceType: "musthave" # at this level, it means if the role exists the rule is a musthave
+          policyRule:
+            apiGroups: ["extensions", "apps"]
+            resources: ["deployments"]
+            verbs: ["get", "list", "watch", "create", "delete","patch"]
+
+---
+apiVersion: mcm.ibm.com/v1alpha1
+kind: PlacementBinding
+metadata:
+  name: binding-role
+  namespace: kube-system
+placementRef:
+  name: placement-role
+  kind: PlacementPolicy
+  apiGroup: mcm.ibm.com
+subjects:
+- name: policy-role
+  kind: Policy
+  apiGroup: policy.mcm.ibm.com
+
+---
+apiVersion: mcm.ibm.com/v1alpha1
+kind: PlacementPolicy
+metadata:
+  name: placement-role
+  namespace: kube-system
+spec:
+  clusterLabels:
+    matchLabels:
+cloud: "IBM"

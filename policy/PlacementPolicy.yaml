@@ -1,0 +1,12 @@
+ apiVersion: mcm.ibm.com/v1alpha1
+ kind: PlacementPolicy
+ metadata:
+   name: placement1
+ spec:
+   clusterNames:
+    - mycluster
+    - local-cluster
+   clusterLabels:
+     matchLabels:
+       dev: "true"
+

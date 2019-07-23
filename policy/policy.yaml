@@ -1,0 +1,26 @@
+ apiVersion: policy.mcm.ibm.com/v1alpha1
+ kind: Policy
+ metadata:
+   name: policy2
+ spec:
+   remediationAction: "enforce" # or inform
+   namespaces:
+      include: ["default"]
+      exclude: ["kube*"]
+ role-templates:
+   - kind: RoleTemplate
+     apiVersion: roletemplate.mcm.ibm.com/v1alpha1
+     complianceType: "musthave" # at this level, it means the role must exist and must have the following rules
+     metadata:
+       namespace: "" # will be inferred
+       name: operator
+     selector:
+       matchLabels:
+         dev: "true"
+     rules:
+       - complianceType: "musthave" # at this level, it means if the role exists the rule is a musthave
+         policyRule:
+           apiGroups: ["extensions", "apps"]
+           resources: ["deployments"]
+           verbs: ["get", "list", "watch", "create", "delete","patch"]
+

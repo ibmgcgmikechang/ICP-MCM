@@ -1,0 +1,56 @@
+apiVersion: policy.mcm.ibm.com/v1alpha1
+kind: Policy
+metadata:
+  name: policy-pod
+  namespace: kube-system
+  annotations:
+    policy.mcm.ibm.com/standards: NIST,HIPAA
+    policy.mcm.ibm.com/categories: SystemAndCommunicationsProtections,SystemAndInformationIntegrity
+    policy.mcm.ibm.com/controls: MutationAdvisor,VA
+spec:
+  complianceType: musthave
+  namespaces:
+    exclude:
+    - kube*
+    include:
+    - default
+  object-templates:
+  - complianceType: musthave
+    objectDefinition:
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        name: nginx-pod
+      spec:
+        containers:
+        - image: nginx:1.7.9
+          name: nginx
+          ports:
+          - containerPort: 80
+  remediationAction: inform
+
+---
+apiVersion: mcm.ibm.com/v1alpha1
+kind: PlacementBinding
+metadata:
+  name: binding-pod
+  namespace: kube-system
+placementRef:
+  name: placement-pod
+  kind: PlacementPolicy
+  apiGroup: mcm.ibm.com
+subjects:
+- name: policy-pod
+  kind: Policy
+  apiGroup: policy.mcm.ibm.com
+
+---
+apiVersion: mcm.ibm.com/v1alpha1
+kind: PlacementPolicy
+metadata:
+  name: placement-pod
+  namespace: kube-system
+spec:
+  clusterLabels:
+    matchLabels:
+cloud: "IBM"
